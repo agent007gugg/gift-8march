@@ -190,7 +190,7 @@
                      const now = new Date();
                     // Проверяем: месяц 2 (это март, так как счет с 0) и число 8
                     // Для теста можешь временно поставить текущее число
-                   if (true) {
+                   if (now.getMonth() === 2 && now.getDate() >=8) {
                         document.getElementById('terminal').style.display = 'none';
                         document.getElementById('timer-container').style.display = 'none';
                         document.body.style.background = '#fff0f5';
@@ -233,3 +233,4 @@
     </body>
 
 </html>
+
