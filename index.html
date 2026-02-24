@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Специально для тебя</title>
+        <style>
+            :root {
+                --green: #00ff00;
+                --pink: #ff69b4;
+            }
+            body {
+                background: #0a0a0a;
+                color: white;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+            #timer-container {
+                text-align: center;
+                margin-bottom: 30px;
+                padding: 20px;
+                border: 1px solid #333;
+                border-radius: 15px;
+                background: rgba(255, 255, 255, 0.05);
+            }
+            #timer {
+                font-size: 2.5em;
+                color: var(--pink);
+                font-weight: bold;
+                text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+            }
+            #terminal {
+                width: 90%;
+                max-width: 600px;
+                font-size: 14px;
+                background: #000;
+                padding: 25px;
+                border-radius: 10px;
+                border: 2px solid #222;
+                box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            }
+            .line {
+                margin-bottom: 10px;
+                font-family: 'Courier New', monospace;
+                color: var(--green);
+                }
+            .input-area {
+                display: flex;
+                gap: 10px;
+                color: var(--green);
+            }
+            input {
+                background: transparent;
+                border: none;
+                color: var(--green);
+                outline: none;
+                font-size: 1.1em;
+                width: 100%;
+                font-family: 'Courier New', monospace;
+            }
+            #celebration {
+                display: none;
+                text-align: center;
+                animation: fadeI 3s ease-in;
+            }
+            .photo-wall {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                margin: 20px;
+            }
+            .photo-wall img { 
+                width: 100%;
+                height: 250px;
+                object-fit: cover;
+                border-radius: 15px;
+                border: 4px solid white;
+                transform: rotate(calc(var(--r) * 1deg));
+            }
+            @keyframes fadeIn {
+                from { opasity: 0; } to { opasity: 1; }
+            }
+            .petal {
+                position: fixed;
+                top: -10%;
+                color: var(--pink);
+                user-select: none;
+                pointer-events: none;
+                z-index: 10;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="timer-container">
+            <div style="margin-bottom: 10px;">До праздника осталось:</div>
+            <div id="timer">Загрузка...</div>
+        </div>
+        <div id="terminal">
+            <div id="output">
+                <div class="line"> > System.init()... DONE</div>
+                <div class="line"> > Security_Check: Введите секретный пароль(твое имя):</div>
+            </div>
+            <div class="input-area">
+                <span></span>
+                <input type="text" id="userInput" autofocus>
+            </div>
+        </div>
+        <div id="celebration">
+            <h1 style="color: var(--pink); font-size: 3em;">С 8 марта любимая!</h1>
+            <p style="font-size: 1.2em;">Ты - самое главное солнышко в моей жизни.</p>
+            <div class="photo-wall">
+                <img src="photo_5249446756347484448_y.jpg" style="--r: -5">
+                <img src="photo_5249446756347484449_x.jpg" style="--r: 3">
+                <img src="photo_5249446756347484450_y.jpg" style="--r: -2">
+            </div>
+            <audio id="music" src="Ooes.mp3" loop></audio>
+        </div>
+        <script>
+           // --- ТАЙМЕР ---
+            function updateTimer() {
+                const now = new Date();
+                let target = new Date(now.getFullYear(), 2, 8);
+                if (now > target) target.setFullYear(now.getFullYear() + 1);
+                const diff = target - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const mins = Math.floor((diff / 1000 / 60) % 60);
+                const secs = Math.floor((diff / 1000) % 60);
+                document.getElementById('timer').innerHTML = days + "д " + hours + "ч " + mins + "м " + secs + "с";
+            }
+            setInterval(updateTimer, 1000);
+            updateTimer();
+
+            // --- ВОПРОСЫ ---
+            const questions = [
+                    { a: "виктория", msg: "Доступ разрешен! В каком городе мы познакомились?" },
+                    { a: "глухов", msg: "Умничка! Какого числа мы познакомились? (день.месяц)" },
+                    { a: "28.09", msg: "ОООО молодец! Ты меня любишь? (да/нет)" },
+                    { a: "да", msg: "Ну разумеется это правильно. И я тебя люблю!!! ❤️" }
+                ];
+
+            let step = 0;
+            const input = document.getElementById('userInput');
+            const output = document.getElementById('output');
+
+            // --- ОБРАБОТКА ВВОДА ---
+            input.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        const val = input.value.toLowerCase().trim();
+                        const targetAns = questions[step].a.toLowerCase().trim();
+
+                        if (val === targetAns) {
+                            // 1. Сначала печатаем [OK] для текущего ввода
+                            const div = document.createElement('div');
+                            div.className = 'line';
+                            div.innerHTML = "> " + input.value + " <span style='color:#00ff00'>[OK]</span>";
+                            output.appendChild(div);
+
+                            // 2. Печатаем вопрос, который привязан к этому ответу
+                            const nextMsg = document.createElement('div');
+                            nextMsg.className = 'line';
+                            nextMsg.textContent = "> " + questions[step].msg;
+                            output.appendChild(nextMsg);
+
+                            // 3. И только теперь переходим к следующему шагу
+                            if (step < questions.length - 1) {
+                                step++;
+                                input.value = '';
+                            } else {
+                                // Если это был последний ответ ("да"), запускаем финал
+                                setTimeout(startParty, 1500); // Задержка 1.5 сек для красоты
+                            }
+                        } else {
+                            const err = document.createElement('div');
+                            err.className = 'line';
+                            err.style.color = 'red';
+                            err.textContent = "> Ошибка доступа. Попробуй еще раз.";
+                            output.appendChild(err);
+                            input.value = '';
+                        }
+                    }
+                });
+            function startParty() {
+                    const now = new Date();
+                    // Проверяем: месяц 2 (это март, так как счет с 0) и число 8
+                    // Для теста можешь временно поставить текущее число
+                    if (now.getMonth() === 2 && now.getDate() >= 8) {
+                        document.getElementById('terminal').style.display = 'none';
+                        document.getElementById('timer-container').style.display = 'none';
+                        document.body.style.background = '#fff0f5';
+                        document.body.style.color = '#333';
+                        document.getElementById('celebration').style.display = 'block';
+
+                        const music = document.getElementById('music');
+                        if (music) music.play();
+
+                        setInterval(createPetal, 300);
+                    } else {
+                        // Если еще не 8 марта, выводим сообщение в терминал
+                        const waitMsg = document.createElement('div');
+                        waitMsg.className = 'line';
+                        waitMsg.style.color = '#ff69b4';
+                        waitMsg.textContent = "> [СИСТЕМА]: Доступ к подарку заблокирован до 8 марта! Жди праздника! ❤️";
+                        output.appendChild(waitMsg);
+                        input.value = '';
+                    }
+                }
+
+            function createPetal() {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.innerHTML = '🌸';
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.position = 'fixed';
+                petal.style.top = '-50px';
+                const duration = Math.random() * 3 + 2;
+                petal.style.transition = "top " + duration + "s linear";
+                document.body.appendChild(petal);
+                setTimeout(function () { petal.style.top = '110%'; }, 10);
+                setTimeout(function () { petal.remove(); }, 5000);
+            }
+
+            // Автофокус
+            document.addEventListener('click', function () { input.focus(); });
+            input.focus();
+        </script>
+    </body>
+</html>
